@@ -15,10 +15,11 @@ class ListArticlesTest extends TestCase
      */
     public function can_fetch_a_single_article(): void
     {
+        $this->withoutExceptionHandling();
         $article = Article::factory()->create();
 
 
-        $response = $this->getJson('/api/v1/articles/' . $article->getRouteKey());
+        $response = $this->getJson('/api/articles/' . $article->getRouteKey());
 
         $response->assertStatus($article->title);
     }

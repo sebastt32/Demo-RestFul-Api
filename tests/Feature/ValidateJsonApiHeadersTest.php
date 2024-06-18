@@ -10,14 +10,23 @@ use Tests\TestCase;
 class ValidateJsonApiHeadersTest extends TestCase
 {
     use RefreshDatabase;
+
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Route::any('test_route', fn () => 'ok')->middleware('validateJsonApiHeaders');
+    }
+
+
+
     /**
      * @test
      */
     public function accept_header_must_be_present_in_all_requests(): void
     {
-        Route::get('test_route', function () {
-            return 'ok';
-        })->middleware('validateJsonApiHeaders');
+
 
         $this->get('test_route')->assertStatus(406);
 
@@ -31,9 +40,7 @@ class ValidateJsonApiHeadersTest extends TestCase
      */
     public function content_type_header_must_be_present_on_all_posts_requests(): void
     {
-        Route::post('test_route', function () {
-            return 'ok';
-        })->middleware('validateJsonApiHeaders');
+
 
         $this->post('test_route', [], ['accept' => 'application/vnd.api+json'])->assertStatus(415);
 
@@ -44,11 +51,13 @@ class ValidateJsonApiHeadersTest extends TestCase
         ])->assertSuccessful();
     }
 
+
+    /**
+     * @test
+     */
     public function content_type_header_must_be_present_on_all_patch_requests(): void
     {
-        Route::patch('test_route', function () {
-            return 'ok';
-        })->middleware('validateJsonApiHeaders');
+
 
         $this->patch('test_route', [], ['accept' => 'application/vnd.api+json'])->assertStatus(415);
 
@@ -64,9 +73,7 @@ class ValidateJsonApiHeadersTest extends TestCase
      */
     function content_type_header_must_be_present_in_responses()
     {
-        Route::any('test_route', function () {
-            return 'ok';
-        })->middleware('validateJsonApiHeaders');
+
 
         $this->get('test_route', [
             'accept' => 'application/vnd.api+json',
@@ -85,7 +92,30 @@ class ValidateJsonApiHeadersTest extends TestCase
         ])->assertHeader('content-type', 'application/vnd.api+json');
     }
 
+    /**
+     * @test
+     */
     function content_type_header_must_not_be_present_in_empty_esponses()
     {
+        Route::any('empty_response', fn () => response()->noContent())->middleware('validateJsonApiHeaders');
+
+        $this->get('empty_response', [
+            'accept' => 'application/vnd.api+json',
+        ])->assertHeaderMissing('content-type');
+
+        $this->post('empty_response', [], [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
+        ])->assertHeaderMissing('content-type');
+
+        $this->patch('empty_response', [], [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
+        ])->assertHeaderMissing('content-type');
+
+        $this->delete('empty_response', [], [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
+        ])->assertHeaderMissing('content-type');
     }
 }

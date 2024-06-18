@@ -11,4 +11,4 @@ Route::get('articles/{article}', [ArticleController::class, 'show'])->name('api.
 
 Route::get('articles', [ArticleController::class, 'index'])->name('api.articles.index');
 
-Route::post('articles', [ArticleController::class, 'store'])->name('api.articles.create');
+Route::post('articles', [ArticleController::class, 'store'])->name('api.articles.store');

@@ -19,7 +19,9 @@ class ListArticlesTest extends TestCase
         $article = Article::factory()->create();
 
 
-        $response = $this->getJson(route('api.articles.show', $article));
+        $response = $this->getJson(route('api.articles.show', $article), [
+            'accept' => 'application/vnd.api+json',
+        ]);
 
         $response->assertExactJson([
             'data' => [

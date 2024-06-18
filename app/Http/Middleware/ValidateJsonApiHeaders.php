@@ -18,12 +18,12 @@ class ValidateJsonApiHeaders
     public function handle(Request $request, Closure $next)
     {
         if ($request->header('accept') !== 'application/vnd.api+json') {
-            throw new HttpException(406, 'Accept header must be present in all requests');
+            throw new HttpException(406, __('Accept header must be present in all requests'));
         }
 
         if ($request->isMethod('post') || $request->isMethod('patch')) {
             if ($request->header('content-type') !== 'application/vnd.api+json') {
-                throw new HttpException(415, 'Content-Type header must be present on all posts requests');
+                throw new HttpException(415, __('Content-Type header must be present on all posts requests'));
             }
         }
 

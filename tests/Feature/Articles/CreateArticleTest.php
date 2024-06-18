@@ -17,7 +17,7 @@ class CreateArticleTest extends TestCase
     {
         $this->withoutExceptionHandling();
         $response = $this->postJson(
-            route('api.articles.create'),
+            route('api.articles.store'),
             [
                 'data' => [
                     'type' => 'articles',
@@ -50,5 +50,96 @@ class CreateArticleTest extends TestCase
                 ]
             ]
         ]);
+    }
+
+    /**
+     * @test
+     */
+    public function title_is_required(): void
+    {
+
+        $response = $this->postJson(
+            route('api.articles.store'),
+            [
+                'data' => [
+                    'type' => 'articles',
+                    'attributes' => [
+                        'slug' => 'Nuevo-Articulo',
+                        'content' => 'Contenido del articulo',
+                    ],
+                ]
+            ]
+        );
+
+        $response->assertJsonValidationErrors('data.attributes.title');
+    }
+    /**
+     * @test
+     */
+
+    public function slug_is_required(): void
+    {
+
+        $response = $this->postJson(
+            route('api.articles.store'),
+            [
+                'data' => [
+                    'type' => 'articles',
+                    'attributes' => [
+                        'title' => 'Nuevo Artículo',
+                        'content' => 'Contenido del articulo',
+                    ],
+                ]
+            ]
+        );
+
+        $response->assertJsonValidationErrors('data.attributes.slug');
+    }
+
+    /**
+     * @test
+     */
+    public function content_is_required(): void
+    {
+
+
+        $response = $this->postJson(
+            route('api.articles.store'),
+            [
+                'data' => [
+                    'type' => 'articles',
+                    'attributes' => [
+                        'title' => 'Nuevo Artículo',
+                        'slug' => 'Nuevo-Articulo',
+                    ],
+                ]
+            ]
+        );
+
+
+
+
+        $response->assertJsonValidationErrors('data.attributes.content');
+    }
+
+    /** @test */
+    public function title_must_be_at_least_4_characters(): void
+    {
+
+        $response = $this->postJson(
+            route('api.articles.store'),
+            [
+                'data' => [
+                    'type' => 'articles',
+                    'attributes' => [
+                        'title' => 'Nue',
+                        'slug' => 'Nuevo-Articulo',
+                        'content' => 'Contenido del articulo',
+                    ],
+                ]
+            ]
+        );
+
+        $response->assertJsonValidationErrors('data.attributes.title');
     }
 }
